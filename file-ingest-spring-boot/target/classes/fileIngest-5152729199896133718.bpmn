@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="definitions_0d2aac8e-2a4d-4ade-b6b6-2c6f4c1284a5" targetNamespace="http://camunda.org/examples" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <process id="file-ingest072f04f4-8718-404f-8406-7c3428ef71e0" isExecutable="true">
+    <startEvent id="start" name="Start">
+      <outgoing>start-service_task_check_file_downloaded</outgoing>
+    </startEvent>
+    <serviceTask camunda:delegateExpression="#{checkFileDownloaded}" id="service_task_check_file_downloaded" name="Check File Downloaded">
+      <incoming>start-service_task_check_file_downloaded</incoming>
+      <outgoing>service_task_check_file_downloaded-gateway_file_dowloaded</outgoing>
+    </serviceTask>
+    <exclusiveGateway camunda:exclusive="true" id="gateway_file_dowloaded" name="File downloaded ?">
+      <incoming>service_task_check_file_downloaded-gateway_file_dowloaded</incoming>
+      <outgoing>gateway_file_dowloaded-trigger_task_start_dataloader</outgoing>
+      <outgoing>gateway_file_dowloaded-end</outgoing>
+    </exclusiveGateway>
+    <serviceTask camunda:delegateExpression="#{triggerDataLoader}" id="trigger_task_start_dataloader" name="Trigger DataLoader">
+      <incoming>gateway_file_dowloaded-trigger_task_start_dataloader</incoming>
+      <outgoing>trigger_task_start_dataloader-end</outgoing>
+    </serviceTask>
+    <endEvent id="end" name="End">
+      <incoming>gateway_file_dowloaded-end</incoming>
+      <incoming>trigger_task_start_dataloader-end</incoming>
+    </endEvent>
+    <sequenceFlow id="start-service_task_check_file_downloaded" sourceRef="start" targetRef="service_task_check_file_downloaded"/>
+    <sequenceFlow id="service_task_check_file_downloaded-gateway_file_dowloaded" sourceRef="service_task_check_file_downloaded" targetRef="gateway_file_dowloaded"/>
+    <sequenceFlow id="gateway_file_dowloaded-trigger_task_start_dataloader" name="YES" sourceRef="gateway_file_dowloaded" targetRef="trigger_task_start_dataloader">
+      <conditionExpression id="conditionExpression_026a5db5-4387-428c-a54c-2569e4c55a13">#{downloaded}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="gateway_file_dowloaded-end" name="NO" sourceRef="gateway_file_dowloaded" targetRef="end">
+      <conditionExpression id="conditionExpression_b12b3451-d807-4b6e-8d28-33e5589adf5f">#{!downloaded}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="trigger_task_start_dataloader-end" sourceRef="trigger_task_start_dataloader" targetRef="end"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_6bc77466-1c56-4080-9944-152e1251fb8b">
+    <bpmndi:BPMNPlane bpmnElement="file-ingest072f04f4-8718-404f-8406-7c3428ef71e0" id="BPMNPlane_2c781191-583e-4ce4-b0df-0e944a6ef1bf">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_f491d841-a173-4938-9ce6-3344181a6d65">
+        <dc:Bounds height="50.0" width="50.0" x="15.0" y="15.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_192a8da0-bb02-4c72-a9a6-cfb63149949b">
+          <dc:Bounds height="50.0" width="50.0" x="15.0" y="65.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="service_task_check_file_downloaded" id="BPMNShape_40b16755-bb04-4cc6-ba59-5af9569d9db7">
+        <dc:Bounds height="80.0" width="100.0" x="150.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gateway_file_dowloaded" id="BPMNShape_d5da43d6-e8b7-417b-85cd-1515ed819e44">
+        <dc:Bounds height="60.0" width="60.0" x="350.0" y="8.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2dd105f3-bf1d-4c96-944a-372856d7f754">
+          <dc:Bounds height="60.0" width="60.0" x="350.0" y="68.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="trigger_task_start_dataloader" id="BPMNShape_f48e84a2-cca7-4744-991b-653704f9e0ca">
+        <dc:Bounds height="80.0" width="100.0" x="470.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_6126a713-ae08-44cf-a0e5-c54c3b522927">
+        <dc:Bounds height="50.0" width="50.0" x="625.0" y="15.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_ebc51275-42b5-4952-b445-581f5e8f1128">
+          <dc:Bounds height="50.0" width="50.0" x="625.0" y="65.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="start-service_task_check_file_downloaded" id="BPMNEdge_6e565f4e-9662-4489-865f-c0914587de13">
+        <di:waypoint x="65.0" y="40.0"/>
+        <di:waypoint x="150.0" y="40.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="service_task_check_file_downloaded-gateway_file_dowloaded" id="BPMNEdge_62d8f4d5-da3d-4454-9ff7-3edaf76c8d5a">
+        <di:waypoint x="250.0" y="40.0"/>
+        <di:waypoint x="350.0" y="40.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="gateway_file_dowloaded-trigger_task_start_dataloader" id="BPMNEdge_c6753587-80e7-45c9-8ca5-d7fff3ea34f3">
+        <di:waypoint x="410.0" y="40.0"/>
+        <di:waypoint x="470.0" y="40.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="gateway_file_dowloaded-end" id="BPMNEdge_cf2f676a-d1a0-493a-ad1d-74a314c71811">
+        <di:waypoint x="380.0" y="65.0"/>
+        <di:waypoint x="380.0" y="120.0"/>
+        <di:waypoint x="650.0" y="120.0"/>
+        <di:waypoint x="650.0" y="65.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="trigger_task_start_dataloader-end" id="BPMNEdge_290699a2-28a2-41b2-83e7-c8d81a4311d1">
+        <di:waypoint x="570.0" y="40.0"/>
+        <di:waypoint x="625.0" y="40.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
